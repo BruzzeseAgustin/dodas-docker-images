@@ -67,7 +67,24 @@ RUN chmod -R +x /xrd/
 
 COPY ca/DODAS.pem /etc/grid-security/certificates/DODAS.pem
 COPY ca/DODAS.key /etc/grid-security/certificates/DODAS.key
+RUN chown -R xrootd: /etc/grid-security/certificates/DODAS.pem /etc/grid-security/certificates/DODAS.key
+
+RUN yum -y install python-pip
+RUN pip install supervisor
+RUN mkdir -p /etc/supervisor/conf.d/
+# ADD supervisor/renew-proxy.sh /
+
+COPY condemand01_pic_es_cert_2.cer /etc/grid-security/hostcert.pem
+COPY condemand01_pic_es_cert_2.key /etc/grid-security/hostcert.key
+
+RUN chown -R xrootd: /etc/grid-security/hostcert.pem /etc/grid-security/hostcert.key
+
+#RUN chown -R xrootd /etc/grid-security/hostcert.pem /etc/grid-security/hostcert.key 
+
+RUN chown -R xrootd: /etc/grid-security/*
+#RUN chown -R xrootd /etc/grid-security/*
 
 WORKDIR /xrd
 
+CMD supervisord -c /etc/supervisord.conf --nodaemon
 ENTRYPOINT ["/xrd/start.sh"]
