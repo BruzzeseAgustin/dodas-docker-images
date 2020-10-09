@@ -1,0 +1,40 @@
+version: '3.7'
+services:
+  xcache:
+    build: .
+    expose:
+      - 1094
+    volumes:
+      # - /etc/grid-security/certificates:/etc/grid-security/certificates
+      # - /etc/grid-security/vomsdir:/etc/grid-security/vomsdir
+      - /tmp/x509up_u02:/tmp/x509up_u02      
+      # - ./supervisor/renew-proxy.sh:/renew-proxy.sh 
+      # - ./supervisor/xcache.conf:/etc/supervisord.d/xcache.conf
+    hostname: condemand01.pic.es
+    environment:
+      X509_USER_PROXY: /tmp/x509up_u02
+      XRD_HOST: xcache
+      ORIGIN_HOST: origin
+      ORIGIN_XRD_PORT: 31294
+      CACHE_RAM_GB: 4
+    #     REDIR_HOST: localhost
+    #     REDIR_CMSD_PORT: 3113
+    #     CACHE_LOG_LEVEL: info
+    #     CACHE_XRD_PORT: 1094
+    #     STREAMS: 256
+    #     LOW_WM: 0.85
+    #     HI_WM: 0.95
+    #     CACHE_PATH: /data
+    #     BLOCK_SIZE: 512k
+    #     N_PREFETCH: 0
+    links:
+       - origin:condemand02.pic.es
+  origin:
+    build: ../xrootd-escape-xrd
+    hostname: condemand02.pic.es
+    environment:
+      XRD_HOST: origin
+    expose:
+      - 1094 
+    volumes:
+      # - /etc/grid-security/certificates:/etc/grid-security/certificates
